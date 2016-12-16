@@ -15,9 +15,9 @@ open Fable.Arch.App
 open Fable.Arch.Html
 
 // Model
-type Model = string
+type Model = { name: string }
 
-let initModel = ""
+let initModel = { name = "" }
 
 type Actions =
     | ChangeInput of string
@@ -25,20 +25,24 @@ type Actions =
 // Update
 let update model msg =
     match msg with
-    | ChangeInput str -> str
+    | ChangeInput str -> { model with name = str }
 
 // On input event, send the input value to the given function.
 let inline onInput' fn = onInput (fun evt -> unbox evt?target?value |> fn)
 
 // View
 let view model =
+  let greeting =
+    if model.name = ""
+    then ""
+    else sprintf "Hello %s!" model.name
   div
     []
     [
       label [] [text "Enter name: "]
       input [onInput' ChangeInput]
       br []
-      span [] [text (sprintf "Hello %s" model)]
+      span [classy "greeting"] [text greeting]
     ]
 
 // Using createSimpleApp instead of createApp since our
