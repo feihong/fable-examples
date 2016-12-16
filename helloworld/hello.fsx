@@ -1,8 +1,5 @@
-(**
- - title: Hello world - getting with simple app
- - tagline: Hello world implemented with fable-arch
- - app-style: width:800px; margin:20px auto 50px auto;
- - intro: This is a simple "hello world" application.
+(*
+This is a simple "hello world" application.
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
@@ -20,6 +17,8 @@ open Fable.Arch.Html
 // Model
 type Model = string
 
+let initModel = ""
+
 type Actions =
     | ChangeInput of string
 
@@ -28,30 +27,25 @@ let update model msg =
     match msg with
     | ChangeInput str -> str
 
+// On input event, send the input value to the given function.
+let inline onInput' fn = onInput (fun evt -> unbox evt?target?value |> fn)
+
 // View
-let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
 let view model =
-    div
-        []
-        [
-            label
-                []
-                [text "Enter name: "]
-            input
-                [
-                    onInput (fun x -> ChangeInput x)
-                ]
-            br []
-            span
-                []
-                [text (sprintf "Hello %s" model)]
-        ]
+  div
+    []
+    [
+      label [] [text "Enter name: "]
+      input [onInput' ChangeInput]
+      br []
+      span [] [text (sprintf "Hello %s" model)]
+    ]
 
 // Using createSimpleApp instead of createApp since our
 // update function doesn't generate any actions. See
 // some of the other more advanced examples for how to
 // use createApp. In addition to the application functions
 // we also need to specify which renderer to use.
-createSimpleApp "" view update Virtualdom.createRender
+createSimpleApp initModel view update Virtualdom.createRender
 |> withStartNodeSelector "#hello"
 |> start
