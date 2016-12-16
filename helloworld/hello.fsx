@@ -7,6 +7,8 @@ This is a simple "hello world" application.
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
 #load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 
+open System
+
 open Fable.Core
 open Fable.Core.JsInterop
 
@@ -32,17 +34,21 @@ let inline onInput' fn = onInput (fun evt -> unbox evt?target?value |> fn)
 
 // View
 let view model =
-  let greeting =
-    if model.name = ""
+  let name = model.name.Trim()
+  let greeting = if name = "" then "" else sprintf "Hello %s!" name
+  let reverse =
+    if name = ""
     then ""
-    else sprintf "Hello %s!" model.name
+    else name.ToCharArray() |> Array.rev |> String |> sprintf "Reverse: %s"
+  let len = if name = "" then "" else sprintf "Length: %d" name.Length
   div
     []
     [
       label [] [text "Enter name: "]
       input [onInput' ChangeInput]
-      br []
-      span [classy "greeting"] [text greeting]
+      div [classy "greeting"] [text greeting]
+      div [classy "reverse"] [text reverse]
+      div [classy "length"] [text len]
     ]
 
 // Using createSimpleApp instead of createApp since our
@@ -51,5 +57,5 @@ let view model =
 // use createApp. In addition to the application functions
 // we also need to specify which renderer to use.
 createSimpleApp initModel view update Virtualdom.createRender
-|> withStartNodeSelector "#hello"
+|> withStartNodeSelector "#app"
 |> start
