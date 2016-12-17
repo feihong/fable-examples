@@ -1,5 +1,7 @@
 (*
 This is a simple "hello world" application.
+
+Source: https://github.com/fable-compiler/fable-arch/tree/master/samples/helloworld
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
@@ -45,7 +47,10 @@ let view model =
     []
     [
       label [] [text "Enter name: "]
-      input [onInput' ChangeInput]
+      input [
+        onInput' ChangeInput
+        attribute "autofocus" ""
+      ]
       div [classy "greeting"] [text greeting]
       div [classy "reverse"] [text reverse]
       div [classy "length"] [text len]
