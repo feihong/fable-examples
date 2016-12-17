@@ -42,7 +42,7 @@ type Model =
   }
 
   static member Init =
-    { InputValue = ""
+    { InputValue = "huge zag"
       ServerResponse = ""
       Status = None
     }
@@ -79,9 +79,8 @@ let update model action =
       // First is a callback to execute when done
       // Second is the data to send
       fakeAjax
-        (fun data ->
-          h (ServerResponse data)
-        )
+        //(fun data -> ServerResponse data |> h)
+        (ServerResponse >> h)
         model.InputValue
       // We just sent an ajax request so make the state pending in the model
       h (SetStatus Pending)
@@ -99,28 +98,24 @@ let view model =
     | Pending -> text "Waiting Server response"
     | Done -> text (sprintf "The server response is: %s" model.ServerResponse)
 
-  div
-    []
-    [
-      label
-        []
-        [text "Enter a sentence: "]
-      br []
-      textarea
-        [
-            onInput ChangeInput
-            property "value" model.InputValue
-        ]
-        []
-      br []
-      button
-        [ onMouseClick (fun _ -> SendEcho) ]
-        [ text "Uppercase by server" ]
-      br []
-      span
-        []
-        [ infoText ]
+  div [] [
+    label [] [text "Enter a sentence: "]
+    br []
+    form [] [
+      input [
+        onInput ChangeInput
+        attribute "autofocus" ""
+        property "value" model.InputValue
+      ]
+      div [] [
+        button [
+          onMouseClick (fun _ -> SendEcho)
+          classy "btn btn-default"
+        ] [ text "Uppercase by server" ]
+      ]
     ]
+    p [] [ infoText ]
+  ]
 
 /// Create our application
 createApp Model.Init view update Virtualdom.createRender

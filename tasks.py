@@ -3,7 +3,7 @@ import subprocess
 import contextlib
 from pathlib import Path
 from invoke import task
-from flask import Flask, send_from_directory
+from flask import Flask, request, send_from_directory
 
 
 @task
@@ -14,6 +14,7 @@ def serve(ctx):
 
 app = Flask(__name__)
 cwd = Path.cwd()
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
@@ -25,6 +26,10 @@ def catch_all(path):
     if filepath.exists():
         return send_from_directory(str(cwd), path)
     return 'not found', 404
+
+@app.route('/upper/')
+def upper():
+    return request.args.get('text', '').upper()
 
 
 @contextlib.contextmanager
