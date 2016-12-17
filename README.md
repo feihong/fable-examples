@@ -15,6 +15,8 @@ npm install -g webpack npm-check-updates
 
 ## Start server
 
+Go into any of the example directories and run this:
+
 ```
 inv serve
 ```
