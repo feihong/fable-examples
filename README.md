@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-pip install Invoke
+pip install Invoke Flask
 npm install -g fable-compiler
 ```
 
