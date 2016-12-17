@@ -45,6 +45,7 @@ let view model =
   let timeFormat =
     if model.showMilitary
     then "HH:mm:ss"
+    // Unfortunately, "tt" does not show AM/PM.
     else "hh:mm:ss " + (if model.datetime.Hour >= 12 then "PM" else "AM")
   div [] [
     text <| model.datetime.ToString("yyyy-MM-dd")
@@ -61,13 +62,12 @@ let view model =
 /// Producer used to send the current Time every second
 let tickProducer push =
     window.setInterval((fun _ ->
-        push(Tick DateTime.Now)
-        null
+        Tick DateTime.Now |> push
     ), 1000) |> ignore
     // Force the first to push to have immediate effect
     // If we don't do that there is one second before the first push
     // and the view is rendered with the Model.init values
-    push(Tick DateTime.Now)
+    Tick DateTime.Now |> push
 
 /// Create and run our application
 createApp Model.init view update (Virtualdom.createRender)
