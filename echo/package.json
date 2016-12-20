@@ -2,6 +2,7 @@
   "devDependencies": {
     "fable-arch": "^0.9.12",
     "fable-core": "^0.7.15",
+    "fable-powerpack": "0.0.19",
     "source-map-loader": "^0.1.5",
     "virtual-dom": "^2.1.1"
   }

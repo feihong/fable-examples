@@ -6,6 +6,7 @@
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
+#r "node_modules/fable-powerpack/Fable.PowerPack.dll"
 #load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
 #load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
@@ -17,16 +18,23 @@ open Fable.Import.Browser
 open Fable.Arch
 open Fable.Arch.App
 open Fable.Arch.Html
+open Fable.PowerPack
+open Fable.PowerPack.Fetch
+
 
 /// Helpers for working with input element from VirtualDom
-let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
+let inline onInput x = onEvent "oninput" (fun evt -> x (unbox evt?target?value))
 
-/// Used to make a fake ajax calls. It emulates a server which return the given input uppercased after 1.5 seconds.
-let fakeAjax cb (data: string) =
-  window.setTimeout((fun _ ->
-    cb (data.ToUpper())
-  )
-  , 1500.) |> ignore
+let ajax cb (data: string) =
+  //window.setTimeout((fun _ ->
+  //  cb (data.ToUpper())
+  //)
+  //, 1500.) |> ignore
+  let url = sprintf "/upper/?text=%s" data
+  fetch url []
+  |> Promise.bind (fun res -> res.text())
+  |> Promise.map cb
+  |> ignore
 
 /// DU used to discriminate the State of the request
 type Status =
@@ -42,7 +50,7 @@ type Model =
   }
 
   static member Init =
-    { InputValue = "huge zag"
+    { InputValue = "It's zumba time!"
       ServerResponse = ""
       Status = None
     }
@@ -78,10 +86,7 @@ let update model action =
       // Send a fake ajax
       // First is a callback to execute when done
       // Second is the data to send
-      fakeAjax
-        //(fun data -> ServerResponse data |> h)
-        (ServerResponse >> h)
-        model.InputValue
+      ajax (ServerResponse >> h) model.InputValue
       // We just sent an ajax request so make the state pending in the model
       h (SetStatus Pending)
     | _ -> ()

@@ -1,6 +1,7 @@
 import signal
 import subprocess
 import contextlib
+import time
 from pathlib import Path
 from invoke import task
 from flask import Flask, request, send_from_directory
@@ -29,6 +30,7 @@ def catch_all(path):
 
 @app.route('/upper/')
 def upper():
+    time.sleep(2)
     return request.args.get('text', '').upper()
 
 
