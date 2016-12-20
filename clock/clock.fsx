@@ -22,55 +22,57 @@ type Action =
     | Tick of DateTime
     | ToggleTimeDisplay
 
-/// A really simple type to Store our ModelChanged
 type Model =
-    { datetime: DateTime
-      showMilitary: bool
+    { Datetime: DateTime
+      ShowMilitary: bool
     }
+    // Static member giving back an init model
+    static member init = { Datetime = DateTime.MinValue; ShowMilitary = false }
 
-    /// Static member giving back an init Model
-    static member init = { datetime = DateTime.MinValue; showMilitary = false }
-
-/// Handle all the update of our Application
 let update model action =
     match action with
-    /// Tick are push by the producer
+    // Tick are push by the producer
     | Tick datetime ->
-      { model with datetime = datetime }, []
+      { model with Datetime = datetime }, []
     | ToggleTimeDisplay ->
-      { model with showMilitary = not model.showMilitary }, []
+      { model with ShowMilitary = not model.ShowMilitary }, []
 
-/// Our application view
 let view model =
   let timeFormat =
-    if model.showMilitary
+    if model.ShowMilitary
     then "HH:mm:ss"
     // Unfortunately, "tt" does not show AM/PM.
-    else "hh:mm:ss " + (if model.datetime.Hour >= 12 then "PM" else "AM")
+    else "hh:mm:ss " + (if model.Datetime.Hour >= 12 then "PM" else "AM")
+
   div [] [
-    text <| model.datetime.ToString("yyyy-MM-dd")
+    text <| model.Datetime.ToString("yyyy-MM-dd")
     br []
-    text <| model.datetime.ToString(timeFormat)
+    text <| model.Datetime.ToString(timeFormat)
     div [] [
       button [
         classy "btn btn-primary"
         onMouseClick (fun _ -> ToggleTimeDisplay)
-      ] [text <| if model.showMilitary then "Regular time" else "Military time"]
+      ] [text <| if model.ShowMilitary then "Regular time" else "Military time"]
     ]
   ]
 
-/// Producer used to send the current Time every second
+// Producer used to send the current DateTime every second
 let tickProducer push =
-    window.setInterval((fun _ ->
-        Tick DateTime.Now |> push
-    ), 1000) |> ignore
+    //window.setInterval((fun _ ->
+    //    Tick DateTime.Now |> push
+    //), 1000) |> ignore
+    let timer = new System.Timers.Timer(1000.0)
+    timer.AutoReset <- true
+    timer.Elapsed.Add (fun _ ->
+      Tick DateTime.Now |> push)
+
     // Force the first to push to have immediate effect
     // If we don't do that there is one second before the first push
     // and the view is rendered with the Model.init values
     Tick DateTime.Now |> push
 
-/// Create and run our application
+// Create and run our application
 createApp Model.init view update (Virtualdom.createRender)
 |> withStartNodeSelector "#app"
-|> withProducer tickProducer    // Attach our producer to the app
+|> withProducer tickProducer    // attach our producer to the app
 |> start
