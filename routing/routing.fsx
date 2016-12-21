@@ -155,11 +155,11 @@ set the route, `None` will do nothing.
 *)
 let mapToRoute r =
     match r with
-    | Show1 -> sprintf "counter1" |> Some
-    | Show2 -> sprintf "counter2" |> Some
+    | Show1 -> "counter1" |> Some
+    | Show2 -> "counter2" |> Some
     | Show1WithCnt i -> sprintf "counter1/%i" i |> Some
     | Show2WithCnt i -> sprintf "counter2/%i" i |> Some
-    | Reset -> sprintf "" |> Some
+    | Reset -> "" |> Some
     | _ -> None
 
 let router = createRouter routes mapToRoute
