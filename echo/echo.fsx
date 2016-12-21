@@ -26,15 +26,18 @@ open Fable.PowerPack.Fetch
 let inline onInput x = onEvent "oninput" (fun evt -> x (unbox evt?target?value))
 
 let ajax cb (data: string) =
-  //window.setTimeout((fun _ ->
-  //  cb (data.ToUpper())
-  //)
-  //, 1500.) |> ignore
   let url = sprintf "/upper/?text=%s" data
-  fetch url []
-  |> Promise.bind (fun res -> res.text())
+  //fetch url []
+  //|> Promise.bind (fun res -> res.text())
+  //|> Promise.map cb
+  //|> ignore
+  promise {
+    let! res = fetch url []
+    return! res.text()
+  }
   |> Promise.map cb
   |> ignore
+
 
 /// DU used to discriminate the State of the request
 type Status =
