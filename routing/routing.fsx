@@ -118,9 +118,9 @@ let nestedView model =
       text " | "
       a [ attribute "href" "#counter2" ] [text "counter2"]
       text " | "
-      a [ attribute "href" "#counter1/5" ] [text "counter1 with 5"]
+      a [ attribute "href" "#counter1/25" ] [text "counter1 with 25"]
       text " | "
-      a [ attribute "href" "#counter2/-5" ] [text "counter2 with -5"]
+      a [ attribute "href" "#counter2/-15" ] [text "counter2 with -15"]
     ]
     Html.map Top (counterView model.Top)
     Html.map Bottom (counterView model.Bottom)
@@ -161,17 +161,17 @@ set the route, `None` will do nothing.
 *)
 let mapToRoute r =
     match r with
-    | Show1 -> "counter1" |> Some
-    | Show2 -> "counter2" |> Some
+    | Show1 -> Some "counter1"
+    | Show2 -> Some "counter2"
     | Show1WithCnt i -> sprintf "counter1/%i" i |> Some
     | Show2WithCnt i -> sprintf "counter2/%i" i |> Some
-    | Reset -> "" |> Some
+    | Reset -> Some ""
     | _ -> None
 
 let router = createRouter routes mapToRoute
 
 (**
-A location handler is used to dealt with the `window.location`,
+A location handler is used to deal with `window.location`,
 this is abstracted so anyone can use whatever lib they want to
 work with the `location`.
 *)
