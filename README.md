@@ -4,14 +4,12 @@
 
 ```
 pip install Invoke Flask
-npm install -g fable-compiler
+npm install -g fable-compiler webpack npm-check-updates
 ```
 
-You probably want to install these tools as well:
+## Build project
 
-```
-npm install -g webpack npm-check-updates
-```
+Go into a project directory, and run ``fable``. You may need to first run ``npm link webpack``.
 
 ## Start server
 

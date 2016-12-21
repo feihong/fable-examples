@@ -51,7 +51,7 @@ let counterUpdate model command =
 let counterView model =
   let bgColor =
     match model.Count with
-    | x when x > 10 -> "lightsteelblue"
+    | x when x > 15 -> "lightsteelblue"
     | x when x < 0 -> "lightsalmon"
     | _ -> "palegreen"
 
@@ -61,8 +61,11 @@ let counterView model =
   ] [
     button [
       classy "btn btn-default"
+      onMouseClick (fun _ -> (Decrement 5))
+    ] [ text "-5" ]
+    button [
+      classy "btn btn-default"
       onMouseClick (fun _ -> (Decrement 1))
-      //onDblClick (fun _ -> ((Decrement 10)))
     ] [ text "-" ]
     div [
       classy "number"
@@ -71,8 +74,11 @@ let counterView model =
     button [
       classy "btn btn-default"
       onMouseClick (fun _ -> (Increment 1))
-      //onDblClick (fun _ -> ((Increment 10)))
     ] [ text "+" ]
+    button [
+      classy "btn btn-default"
+      onMouseClick (fun _ -> (Increment 5))
+    ] [ text "+5" ]
   ]
 
 
