@@ -25,11 +25,12 @@ open Fable.Arch.Html
 // model
 type Model =
   {
+    Name: string
     Count: int
     Show: bool      // whether to show the view
   }
 
-let initCounter = {Count = 3; Show = true}
+let initCounter = {Name="?"; Count = 3; Show = true}
 
 (**
 The model for the first example is a simple integer that will act as hour counter.
@@ -51,14 +52,15 @@ let counterUpdate model command =
 let counterView model =
   let bgColor =
     match model.Count with
-    | x when x > 15 -> "lightsteelblue"
+    | x when x > 15 -> "palegreen"
     | x when x < 0 -> "lightsalmon"
-    | _ -> "palegreen"
+    | _ -> "lightsteelblue"
 
   div [
     classy "counter"
     Style [ "display", if model.Show then "" else "none" ]
   ] [
+    div [classy "name"] [text model.Name]
     button [
       classy "btn btn-default"
       onMouseClick (fun _ -> (Decrement 5))
@@ -95,7 +97,11 @@ type NestedAction =
 
 let nestedUpdate model action =
     match action with
-    | Reset -> {Top = initCounter; Bottom = initCounter}
+    | Reset ->
+      {
+        Top = {initCounter with Name = model.Top.Name}
+        Bottom = {initCounter with Name = model.Bottom.Name}
+      }
     | Top ca ->
         let res = counterUpdate model.Top ca
         {model with Top = res}
@@ -125,13 +131,10 @@ let nestedView model =
     Html.map Top (counterView model.Top)
     Html.map Bottom (counterView model.Bottom)
     button [
-      classy "btn btn-default"
+      classy "btn btn-primary"
       onMouseClick (fun _ -> Reset)
     ] [ text "Reset" ]
   ]
-
-let resetEveryTenth h =
-    window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
 (**
 The routing part starts here.
@@ -177,14 +180,14 @@ work with the `location`.
 *)
 let locationHandler =
   {
-    SubscribeToChange =
-        (fun h ->
-            window.addEventListener_hashchange(fun _ ->
-                h (window.location.hash.Substring 1)
-                null
-        ))
-    PushChange =
-        fun s -> location.assign (sprintf "#%s" s)
+    SubscribeToChange = fun h ->
+      window.addEventListener_hashchange(fun _ ->
+          h (window.location.hash.Substring 1)
+          null
+      )
+    PushChange = fun s ->
+      printfn "Inside PushChange: %A" s
+      window.location.assign (sprintf "#%s" s)
   }
 
 let routerF m = router.Route m.Message
@@ -194,9 +197,14 @@ We add a `routeProducer`, which is what listens to the location
 changes. We also add a `routeSubscriber`, which listens to events
 from the app and update the location accordingly.
 *)
-createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate Virtualdom.createRender
+let nestedInit =
+  {
+    Top = {initCounter with Name = "Counter 1"}
+    Bottom = {initCounter with Name = "Counter 2"}
+  }
+createSimpleApp nestedInit nestedView nestedUpdate Virtualdom.createRender
 |> withStartNodeSelector "#app"
 |> withProducer (routeProducer locationHandler router)
 |> withSubscriber (routeSubscriber locationHandler routerF)
-|> withSubscriber (printfn "%A")
+//|> withSubscriber (printfn "%A")
 |> start
